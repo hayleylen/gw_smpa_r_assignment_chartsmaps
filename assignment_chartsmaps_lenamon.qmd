@@ -25,7 +25,6 @@ library(janitor)
 library(rmapshaper)
 library(here)
 options(tigris_class = "sf")
-
 ```
 # Introduction
 
@@ -78,21 +77,24 @@ ggplot(data=governor_results, aes(x=factor(is_r_above_trump))) + geom_bar()
 ```
 
 **3)**
-For the Senate race, create a chart that shows the top 10 biggest drops between the Republican candidate and Trump (i.e. the 10 counties with the most substantial negative numbers in `pct_r_above_trump`). Remember that you can slice off a certain number of rows using the `head()` function, i.e. `head(5),` `head(20)`, etc.
-
-Your chart should be sorted from the biggest drop to the smallest among the top 10 counties.
+For the Senate race, create a chart that shows the top 10 biggest drops between the Republican candidate and Trump (i.e. the 10 counties with the most substantial negative numbers in `pct_r_above_trump`). Remember that you can slice off a certain number of rows using the `head()` function, i.e. `head(5),` `head(20)`, etc. Your chart should be sorted from the biggest drop to the smallest among the top 10 counties.
 
 ```{r}
+no3 <- arrange(senate_results, pct_r_above_trump)
+top10senate <- no3 %>% head(10)
 
-
-
+ggplot(data=top10senate, aes(x=factor(pct_r_above_trump))) + geom_bar() 
 ```
 
 **4)**
 For the Senate race, create a chart that shows the top 10 counties highest margins of victory for the Democratic candidate. To do that you'll need to compare the Democratic candidate's percentage (pct_d\_2022) with the Republican's (pct_r\_2022) to calculate the margin of victory for each county.
 
 ```{r}
+senate_margin <- senate_results %>% mutate(dem_margin = pct_d_2022 - pct_r_2022)
+no4 <- arrange(senate_margin, dem_margin)
+top10_senate_margin <- no4 %>% head(10)
 
+ggplot(data=top10_senate_margin, aes(x=factor(dem_margin))) + geom_bar()
 
 ```
 
@@ -100,17 +102,11 @@ For the Senate race, create a chart that shows the top 10 counties highest margi
 Now do the same as Question 4, only this time for the race for Governor instead.
 
 ```{r}
+gov_margin <- governor_results %>% mutate(dem_margin = pct_d_2022 - pct_r_2022)
+no5 <- arrange(gov_margin, dem_margin)
+top10_gov_margin <- no5 %>% head(10)
 
-
-```
-
-**6)**
-*Extra credit:* determine the top 10 counties with the biggest differences between what the Republican candidate for Governor received and what the Senate candidate received.
-
-(Note that to accomplish this you'll have to first run a join that merges the two datasets, so that you have both the senate and governor version of the `pct_r_2022` column in the same table.)
-
-```{r}
-
+ggplot(data=top10_gov_margin, aes(x=factor(dem_margin))) + geom_bar()
 
 ```
 
@@ -127,7 +123,6 @@ Now let's take a look at what we have, by mapping out the polygons of the Georgi
 ```{r}
 tm_shape(counties_geo) + 
   tm_polygons()
-
 ```
 Great, it looks like we should be good to go. Use the newly created map data in `counties_geo` along with our election results datasets to complete the questions below.
 
@@ -168,16 +163,6 @@ gov_margin <- governor_results %>% mutate(dem_margin = pct_d_2022 - pct_r_2022)
 
 number10 <- merge(counties_geo, gov_margin, by.x= "NAME", by.y = "county")
 tm_shape(number10) + tm_polygons(col="dem_margin")
-
-```
-
-**11)**
-*Extra credit:* determine the biggest differences between what the Republican candidate for Governor received and what the Senate candidate received. Then create a choropleth map of Georgia counties that shows those differences.
-
-(Note that to accomplish this you'll have to first run a join that merges the two datasets, so that you have both the senate and governor version of the `pct_r_2022` column in the same table.)
-
-```{r}
-
 
 ```
 # 
